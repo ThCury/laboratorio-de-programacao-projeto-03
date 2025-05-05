@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Aluno {
+  id            Int         @id @default(autoincrement())
+  nome          String
+  email         String      @unique
+  CPF           String      @unique
+  RG            String      @unique
+  endereco      String
+  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id])
+  instituicaoId Int
+  curso         String
+  saldo         Float       @default(0)
+  Transacao     Transacao[]
+}
+
+model Professor {
+  id            Int         @id @default(autoincrement())
+  nome          String
+  CPF           String      @unique
+  departamento  String
+  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id])
+  instituicaoId Int
+  saldo         Float       @default(1000)
+  Transacao     Transacao[]
+}
+
+model Instituicao {
+  id        Int         @id @default(autoincrement())
+  nome      String      @unique
+  endereco  String
+  CNPJ      String      @unique
+  Aluno     Aluno[]
+  Professor Professor[]
+}
+
+enum TipoTransacao {
+  DEPOSITO
+  TRANSFERENCIA
+  RESGATE_VANTAGEM
+}
+
+model Transacao {
+  id    Int           @id @default(autoincrement())
+  tipo  TipoTransacao
+  valor Float
+
+  alunoId     Int?
+  professorId Int?
+  vantagemId  Int?
+
+  aluno     Aluno?     @relation(fields: [alunoId], references: [id])
+  professor Professor? @relation(fields: [professorId], references: [id])
+  vantagem  Vantagem?  @relation(fields: [vantagemId], references: [id])
+}
+
+model Vantagem {
+  id         Int         @id @default(autoincrement())
+  titulo     String
+  descricao  String
+  custo      Float
+  empresa    Empresa     @relation(fields: [empresaId], references: [id])
+  empresaId  Int
+  transacoes Transacao[]
+}
+
+model Empresa {
+  id        Int        @id @default(autoincrement())
+  nome      String
+  email     String     @unique
+  cnpj      String     @unique
+  vantagens Vantagem[]
+}
