@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EmpresaDto } from './dto/empresa.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { VantagemDto } from 'src/vantagem/dto/vantagem.dto';
@@ -62,7 +62,7 @@ export class EmpresaService {
       }
     })
     if (!empresa) {
-      throw new Error('Empresa não encontrada')
+      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
     }
 
     return new EmpresaDto(
@@ -106,7 +106,7 @@ export class EmpresaService {
       }
     })
     if (!empresa) {
-      throw new Error('Empresa não encontrada')
+      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
     }
     return { message: `Empresa com Id ${id} deletado com sucesso` };
   }
@@ -114,7 +114,7 @@ export class EmpresaService {
   async addVantagemToEmpresa(empresaId: number, dto: VantagemDto): Promise<VantagemDto> {
     const empresa = await this.prisma.empresa.findUnique({ where: { id: empresaId } });
     if (!empresa) {
-      throw new Error('Empresa não encontrada');
+      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
     }
 
     const vantagem = await this.prisma.vantagem.create({
@@ -142,7 +142,7 @@ export class EmpresaService {
     });
 
     if (!empresa) {
-      throw new Error('Empresa não encontrada');
+      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
     }
 
     return empresa.vantagens.map(
