@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe } from '@nestjs/common';
 import { AlunoService } from './aluno.service';
-import { CreateAlunoDto } from './dto/create-aluno.dto';
-import { UpdateAlunoDto } from './dto/update-aluno.dto';
+import { AlunoDto } from './dto/aluno.dto';
 
 @Controller('aluno')
 export class AlunoController {
   constructor(private readonly alunoService: AlunoService) {}
 
-  @Post()
-  create(@Body() createAlunoDto: CreateAlunoDto) {
-    return this.alunoService.create(createAlunoDto);
+  @Post('cadastro')
+  async create(@Body() aluno: AlunoDto) {
+    return await this.alunoService.create(aluno);
   }
 
-  @Get()
-  findAll() {
-    return this.alunoService.findAll();
+  @Get('buscarAlunos')
+  async findAll() {
+    return await this.alunoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alunoService.findOne(+id);
+  @Get('buscarAluno/:id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.alunoService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlunoDto: UpdateAlunoDto) {
-    return this.alunoService.update(+id, updateAlunoDto);
+  @Put('atualizarAluno/:id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() aluno: AlunoDto) {
+    return await this.alunoService.update(id, aluno);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.alunoService.remove(+id);
+  @Delete('deletarAluno/:id')
+  async remove(@Param('id') id: number) {
+    return await this.alunoService.delete(+id);
   }
 }
