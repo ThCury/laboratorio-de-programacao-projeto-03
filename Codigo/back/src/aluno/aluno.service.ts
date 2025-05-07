@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { AlunoDto } from './dto/aluno.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TransacaoDto } from 'src/transacao/dto/transacao.dto';
 
 @Injectable()
 export class AlunoService {
@@ -61,7 +62,7 @@ export class AlunoService {
       },
     });
     if (!aluno) {
-      throw new Error(`Aluno com Id ${id} não encontrado`);
+      throw new HttpException(`Aluno com Id ${id} não encontrado`, HttpStatus.NOT_FOUND);
     }
     return new AlunoDto(
       id,
@@ -113,5 +114,41 @@ export class AlunoService {
       }
     })
     return { message: `Aluno com Id ${id} deletado com sucesso` };
+  }
+
+  async getSaldo(id: number){
+    const aluno = await this.prisma.aluno.findUnique({
+      where: { id },
+    });
+
+    if (!aluno) {
+      throw new HttpException(`Aluno com Id ${id} não encontrado`, HttpStatus.NOT_FOUND);
+    }
+
+    return aluno.saldo;
+  }
+
+  async getHistoricoTransacoes(id: number): Promise<TransacaoDto[]> {
+    const transacoes = await this.prisma.transacao.findMany({
+      where: { alunoId: id },
+      include: {
+        professor: true,  
+      },
+    });
+
+    if (transacoes.length === 0) {
+      throw new HttpException(`Aluno com Id ${id} não possui transações registradas`, HttpStatus.NOT_FOUND);
+    }
+
+    return transacoes.map(
+      (transacao) =>
+        new TransacaoDto(
+          transacao.id,
+          transacao.tipo,
+          transacao.valor,
+          transacao.professorId ?? undefined,
+          transacao.alunoId ?? undefined
+        ),
+    );
   }
 }

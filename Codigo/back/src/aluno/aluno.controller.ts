@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe } from '@nestjs/common';
 import { AlunoService } from './aluno.service';
 import { AlunoDto } from './dto/aluno.dto';
+import { TransacaoDto } from 'src/transacao/dto/transacao.dto';
 
 @Controller('aluno')
 export class AlunoController {
-  constructor(private readonly alunoService: AlunoService) {}
+  constructor(private readonly alunoService: AlunoService) { }
 
   @Post('cadastro')
   async create(@Body() aluno: AlunoDto) {
@@ -28,6 +29,16 @@ export class AlunoController {
 
   @Delete('deletarAluno/:id')
   async remove(@Param('id') id: number) {
-    return await this.alunoService.delete(+id);
+    return await this.alunoService.delete(id);
+  }
+
+  @Get(':id/saldo')
+  async getSaldo(@Param('id', ParseIntPipe) id: number) {
+    return this.alunoService.getSaldo(id);
+  }
+
+  @Get(':id/historico')
+  async getHistoricoTransacoes(@Param('id', ParseIntPipe) id: number) {
+    return this.alunoService.getHistoricoTransacoes(id);
   }
 }
