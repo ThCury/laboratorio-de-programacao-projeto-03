@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
-import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
+import { InstituicaoDto } from './dto/instituicao.dto';
 
 @Injectable()
 export class InstituicaoService {
-  create(createInstituicaoDto: CreateInstituicaoDto) {
+  create(createInstituicaoDto: InstituicaoDto) {
     return 'This action adds a new instituicao';
   }
 
@@ -16,7 +15,7 @@ export class InstituicaoService {
     return `This action returns a #${id} instituicao`;
   }
 
-  update(id: number, updateInstituicaoDto: UpdateInstituicaoDto) {
+  update(id: number, updateInstituicaoDto: InstituicaoDto) {
     return `This action updates a #${id} instituicao`;
   }
 
