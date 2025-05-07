@@ -9,6 +9,7 @@ import {
 import { VantagemDto } from 'src/vantagem/dto/vantagem.dto';
 import { Type } from 'class-transformer';
 export class EmpresaDto {
+
     @IsOptional()
     id?: number;
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
 import { EmpresaService } from './empresa.service';
 import { EmpresaDto } from './dto/empresa.dto';
 
@@ -6,28 +6,28 @@ import { EmpresaDto } from './dto/empresa.dto';
 export class EmpresaController {
   constructor(private readonly empresaService: EmpresaService) {}
 
-  @Post()
-  create(@Body() createEmpresaDto: EmpresaDto) {
-    return this.empresaService.create(createEmpresaDto);
+  @Post('cadastro')
+  async create(@Body() dto: EmpresaDto) {
+    return await this.empresaService.create(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.empresaService.findAll();
+  @Get('buscarEmpresas')
+  async findAll() {
+    return await this.empresaService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.empresaService.findOne(+id);
+  @Get('buscarEmpresa/:id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.empresaService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmpresaDto: EmpresaDto) {
-    return this.empresaService.update(+id, updateEmpresaDto);
+  @Put('editarEmpresa/:id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: EmpresaDto) {
+    return this.empresaService.update(id, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.empresaService.remove(+id);
+  @Delete('deletarEmpresa/:id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.empresaService.delete(id);
   }
 }
