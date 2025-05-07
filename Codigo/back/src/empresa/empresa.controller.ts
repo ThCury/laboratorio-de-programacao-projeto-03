@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
 import { EmpresaService } from './empresa.service';
 import { EmpresaDto } from './dto/empresa.dto';
+import { VantagemDto } from 'src/vantagem/dto/vantagem.dto';
 
 @Controller('empresa')
 export class EmpresaController {
-  constructor(private readonly empresaService: EmpresaService) {}
+  constructor(private readonly empresaService: EmpresaService) { }
 
   @Post('cadastro')
   async create(@Body() dto: EmpresaDto) {
@@ -29,5 +30,15 @@ export class EmpresaController {
   @Delete('deletarEmpresa/:id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.empresaService.delete(id);
+  }
+
+  @Put(':empresaId/adicionarVantagem')
+  async addVantagem(@Param('empresaId', ParseIntPipe) empresaId: number, @Body() dto: VantagemDto) {
+    return await this.empresaService.addVantagemToEmpresa(empresaId, dto);
+  }
+
+  @Get(':id/vantagens')
+  async getVantagens(@Param('id', ParseIntPipe) id: number) {
+    return await this.empresaService.findVantagensByEmpresa(id);
   }
 }

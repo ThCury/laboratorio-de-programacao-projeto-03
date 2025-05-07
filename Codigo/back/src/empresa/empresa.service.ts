@@ -110,4 +110,52 @@ export class EmpresaService {
     }
     return { message: `Empresa com Id ${id} deletado com sucesso` };
   }
+
+  async addVantagemToEmpresa(empresaId: number, dto: VantagemDto): Promise<VantagemDto> {
+    const empresa = await this.prisma.empresa.findUnique({ where: { id: empresaId } });
+    if (!empresa) {
+      throw new Error('Empresa não encontrada');
+    }
+
+    const vantagem = await this.prisma.vantagem.create({
+      data: {
+        titulo: dto.titulo,
+        descricao: dto.descricao,
+        custo: dto.custo,
+        empresaId: empresaId,
+      },
+    });
+
+    return new VantagemDto(
+      vantagem.id,
+      vantagem.titulo,
+      vantagem.descricao,
+      vantagem.custo,
+      vantagem.empresaId
+    );
+  }
+
+  async findVantagensByEmpresa(empresaId: number): Promise<VantagemDto[]> {
+    const empresa = await this.prisma.empresa.findUnique({
+      where: { id: empresaId },
+      include: { vantagens: true }
+    });
+
+    if (!empresa) {
+      throw new Error('Empresa não encontrada');
+    }
+
+    return empresa.vantagens.map(
+      (vantagem) =>
+        new VantagemDto(
+          vantagem.id,
+          vantagem.titulo,
+          vantagem.descricao,
+          vantagem.custo,
+          vantagem.empresaId
+        )
+    );
+  }
+
+
 }
