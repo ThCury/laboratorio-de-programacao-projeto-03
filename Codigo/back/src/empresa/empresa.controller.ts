@@ -32,7 +32,7 @@ export class EmpresaController {
     return this.empresaService.delete(id);
   }
 
-  @Put(':empresaId/adicionarVantagem')
+  @Post(':empresaId/adicionarVantagem')
   async addVantagem(@Param('empresaId', ParseIntPipe) empresaId: number, @Body() dto: VantagemDto) {
     return await this.empresaService.addVantagemToEmpresa(empresaId, dto);
   }

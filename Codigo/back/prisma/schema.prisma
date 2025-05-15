@@ -67,8 +67,8 @@ model Vantagem {
   titulo     String
   descricao  String
   custo      Float
-  empresa    Empresa     @relation(fields: [empresaId], references: [id])
-  empresaId  Int
+  empresa    Empresa     @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  empresaId  Int         
   transacoes Transacao[]
 }
 
@@ -77,5 +77,5 @@ model Empresa {
   nome      String
   email     String     @unique
   cnpj      String     @unique
-  vantagens Vantagem[]
+  vantagens Vantagem[] 
 }
