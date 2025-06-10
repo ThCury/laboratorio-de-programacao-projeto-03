@@ -28,7 +28,7 @@ export class AlunoController {
   }
 
   @Delete('deletarAluno/:id')
-  async remove(@Param('id') id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.alunoService.delete(id);
   }
 
