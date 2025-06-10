@@ -3,13 +3,15 @@ import {
     IsNotEmpty,
     IsOptional,
     IsString,
+    ValidateNested,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { TransacaoDto } from 'src/transacao/dto/transacao.dto';
 export class AlunoDto {
 
     @IsOptional()
     id?: number;
-    
+
     @IsString()
     @IsNotEmpty()
     nome: string;
@@ -46,6 +48,11 @@ export class AlunoDto {
     })
     instituicaoId: number;
 
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => TransacaoDto)
+    transacoes?: TransacaoDto[];
+
     constructor(
         id: number,
         nome: string,
@@ -56,6 +63,8 @@ export class AlunoDto {
         curso: string,
         saldo: number,
         instituicaoId: number,
+        transacoes?: TransacaoDto[],
+
     ) {
         this.id = id;
         this.nome = nome;
@@ -66,5 +75,6 @@ export class AlunoDto {
         this.curso = curso;
         this.saldo = saldo;
         this.instituicaoId = instituicaoId;
+        this.transacoes = transacoes
     }
 }
