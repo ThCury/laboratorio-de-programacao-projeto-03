@@ -32,10 +32,10 @@ export class EmpresaDto {
     vantagens?: VantagemDto[];
 
     constructor(
-        id: number,
         nome: string,
         email: string,
         cnpj: string,
+        id?: number,
         vantagens?: VantagemDto[]
     ) {
         this.id = id;
