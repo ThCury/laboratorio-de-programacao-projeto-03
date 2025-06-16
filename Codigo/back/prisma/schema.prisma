@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -20,6 +19,14 @@ model Aluno {
   curso         String
   saldo         Float       @default(0)
   Transacao     Transacao[]
+  Cupom         Cupom[]
+}
+
+model Cupom {
+  id           Int   @id @default(autoincrement())
+  taxaDesconto Float
+  aluno        Aluno @relation(fields: [alunoId], references: [id])
+  alunoId      Int
 }
 
 model Professor {
@@ -68,7 +75,7 @@ model Vantagem {
   descricao  String
   custo      Float
   empresa    Empresa     @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  empresaId  Int         
+  empresaId  Int
   transacoes Transacao[]
 }
 
@@ -77,5 +84,5 @@ model Empresa {
   nome      String
   email     String     @unique
   cnpj      String     @unique
-  vantagens Vantagem[] 
+  vantagens Vantagem[]
 }

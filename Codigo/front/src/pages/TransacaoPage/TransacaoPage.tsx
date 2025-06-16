@@ -23,9 +23,9 @@ const Container = styled.div`
 const { Option } = Select;
 
 export const TipoTransacao = {
-  RECEITA: 'RECEITA',
-  DESPESA: 'DESPESA',
-  OUTRO: 'OUTRO',
+  DEPOSITO: 'DEPOSITO',
+  TRANSFERENCIA: 'TRANSFERENCIA',
+  RESGATE_VANTAGEM: 'RESGATE_VANTAGEM',
 } as const;
 
 export type TipoTransacao = typeof TipoTransacao[keyof typeof TipoTransacao];

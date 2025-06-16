@@ -5,5 +5,6 @@ import { AlunoController } from './aluno.controller';
 @Module({
   controllers: [AlunoController],
   providers: [AlunoService],
+  exports: [AlunoService],
 })
-export class AlunoModule {}
+export class AlunoModule { }

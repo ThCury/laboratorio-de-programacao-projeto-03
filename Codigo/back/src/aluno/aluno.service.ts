@@ -5,7 +5,7 @@ import { TransacaoDto } from 'src/transacao/dto/transacao.dto';
 
 @Injectable()
 export class AlunoService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(dto: AlunoDto): Promise<AlunoDto> {
     const aluno = await this.prisma.aluno.create({
@@ -107,7 +107,34 @@ export class AlunoService {
 
   }
 
-  async delete(id: number){
+  async updateSaldo(id: number, valorTransacao: number): Promise<AlunoDto> {
+    const aluno = await this.findOne(id);
+    const novoSaldo = aluno.saldo + valorTransacao;
+
+    if (novoSaldo < 0) {
+      throw new HttpException(`Saldo insuficiente para o aluno com id ${id}.`, HttpStatus.BAD_REQUEST);
+    }
+
+    const updatedAluno = await this.prisma.aluno.update({
+      where: { id },
+      data: { saldo: novoSaldo },
+    });
+
+    return new AlunoDto(
+      updatedAluno.id,
+      updatedAluno.nome,
+      updatedAluno.email,
+      updatedAluno.CPF,
+      updatedAluno.RG,
+      updatedAluno.endereco,
+      updatedAluno.curso,
+      updatedAluno.saldo,
+      updatedAluno.instituicaoId,
+    );
+  }
+
+
+  async delete(id: number) {
     await this.prisma.aluno.delete({
       where: {
         id: id,
@@ -116,7 +143,7 @@ export class AlunoService {
     return { message: `Aluno com Id ${id} deletado com sucesso` };
   }
 
-  async getSaldo(id: number){
+  async getSaldo(id: number) {
     const aluno = await this.prisma.aluno.findUnique({
       where: { id },
     });
@@ -132,7 +159,7 @@ export class AlunoService {
     const transacoes = await this.prisma.transacao.findMany({
       where: { alunoId: id },
       include: {
-        professor: true,  
+        professor: true,
       },
     });
 

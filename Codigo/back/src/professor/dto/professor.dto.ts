@@ -29,7 +29,7 @@ export class ProfessorDto {
     @Transform(({ value }) => {
         return Number(value);
     })
-    saldo: number = 1000;
+    saldo: number;
 
     @IsOptional()
     @ValidateNested({ each: true })

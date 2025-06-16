@@ -4,7 +4,7 @@ import { VantagemDto } from './dto/vantagem.dto';
 
 @Injectable()
 export class VantagemService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(dto: VantagemDto): Promise<VantagemDto> {
     const data: any = {
@@ -26,6 +26,26 @@ export class VantagemService {
       vantagem.custo,
       vantagem.empresaId,
     );
+  }
+
+
+
+  async listarVantagensPorEmpresa(empresaId: number): Promise<VantagemDto[]> {
+    const vantagens = await this.prisma.vantagem.findMany({
+      where: { empresaId },
+    });
+
+    if (!vantagens || vantagens.length === 0) {
+      throw new HttpException(`Nenhuma vantagem encontrada para a empresa com id ${empresaId}`, HttpStatus.NOT_FOUND);
+    }
+
+    return vantagens.map(v => new VantagemDto(
+      v.id,
+      v.titulo,
+      v.descricao,
+      v.custo,
+      v.empresaId,
+    ));
   }
 
   async findAll(): Promise<VantagemDto[]> {

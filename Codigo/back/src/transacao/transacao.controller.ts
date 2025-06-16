@@ -1,45 +1,62 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { TransacaoService } from './transacao.service';
 import { TransacaoDto } from './dto/transacao.dto';
+import { Transacao } from '@prisma/client';
 
-@Controller('transacao')
+@Controller('transacoes')
 export class TransacaoController {
-  constructor(private readonly transacaoService: TransacaoService) {}
+  constructor(private readonly transacaoService: TransacaoService) { }
 
   @Post()
-  create(@Body() createTransacaoDto: TransacaoDto) {
-    return this.transacaoService.create(createTransacaoDto);
+  async create(@Body() transacaoDto: TransacaoDto): Promise<Transacao> {
+    return this.transacaoService.create(transacaoDto);
   }
 
   @Get()
-  findAll() {
+  async findAll(): Promise<Transacao[]> {
     return this.transacaoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    const transacao = this.transacaoService.findOne(+id);
-    if (!transacao) {
-      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
-    }
-    return transacao;
+  @Get('aluno/:alunoId')
+  async findByAlunoId(@Param('alunoId', ParseIntPipe) alunoId: number): Promise<Transacao[]> {
+    return this.transacaoService.findByAlunoId(alunoId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransacaoDto: TransacaoDto) {
-    const updated = this.transacaoService.update(+id, updateTransacaoDto);
-    if (!updated) {
-      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
-    }
-    return updated;
+  @Get('professor/:professorId')
+  async findByProfessorId(@Param('professorId', ParseIntPipe) professorId: number): Promise<Transacao[]> {
+    return this.transacaoService.findByProfessorId(professorId);
+  }
+
+
+
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() transacaoDto: TransacaoDto,
+  ): Promise<Transacao> {
+    return this.transacaoService.update(id, transacaoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    const deleted = this.transacaoService.remove(+id);
-    if (!deleted) {
-      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
-    }
-    return deleted;
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<Transacao> {
+    return this.transacaoService.delete(id);
+  }
+
+
+  @Post('comprar-com-cupom')
+  async comprarComCupom(
+    @Body() body: { transacaoDto: TransacaoDto; cupomId: number }
+  ) {
+    const { transacaoDto, cupomId } = body;
+    return this.transacaoService.comprarComCupom(transacaoDto, cupomId);
   }
 }

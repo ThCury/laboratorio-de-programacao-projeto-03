@@ -4,13 +4,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProfessorService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createProfessorDto: ProfessorDto): Promise<ProfessorDto> {
+    const saldo = 1000;
     const novoProfessor = await this.prisma.professor.create({
       data: {
         ...createProfessorDto,
-        saldo: createProfessorDto.saldo,
+        saldo: saldo
       },
     });
     return novoProfessor;
@@ -31,11 +32,28 @@ export class ProfessorService {
   }
 
   async update(id: number, updateProfessorDto: ProfessorDto): Promise<ProfessorDto> {
-    await this.findOne(id); // para lançar exceção se não existir
+    await this.findOne(id);
 
     const updated = await this.prisma.professor.update({
       where: { id },
       data: updateProfessorDto,
+    });
+    return updated;
+  }
+
+
+  async updateSaldo(id: number, valorTrasacao: number): Promise<ProfessorDto> {
+    const professor = await this.findOne(id);
+    const saldo = professor.saldo + valorTrasacao;
+
+    if (saldo < 0) {
+      throw new NotFoundException(`Saldo insuficiente para o professor com id ${id}.`);
+    }
+
+
+    const updated = await this.prisma.professor.update({
+      where: { id },
+      data: { saldo: saldo },
     });
     return updated;
   }
