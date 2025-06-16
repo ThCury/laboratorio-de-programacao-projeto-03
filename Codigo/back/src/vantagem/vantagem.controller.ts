@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { VantagemService } from './vantagem.service';
 import { VantagemDto } from './dto/vantagem.dto';
 
@@ -6,28 +15,28 @@ import { VantagemDto } from './dto/vantagem.dto';
 export class VantagemController {
   constructor(private readonly vantagemService: VantagemService) {}
 
-  @Post()
-  create(@Body() createVantagemDto: VantagemDto) {
-    return this.vantagemService.create(createVantagemDto);
+  @Post('cadastro')
+  async create(@Body() dto: VantagemDto) {
+    return await this.vantagemService.create(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.vantagemService.findAll();
+  @Get('buscarVantagens')
+  async findAll() {
+    return await this.vantagemService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vantagemService.findOne(+id);
+  @Get('buscarVantagem/:id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.vantagemService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVantagemDto: VantagemDto) {
-    return this.vantagemService.update(+id, updateVantagemDto);
+  @Put('atualizarVantagem/:id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: VantagemDto) {
+    return await this.vantagemService.update(id, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vantagemService.remove(+id);
+  @Delete('deletarVantagem/:id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return await this.vantagemService.delete(id);
   }
 }

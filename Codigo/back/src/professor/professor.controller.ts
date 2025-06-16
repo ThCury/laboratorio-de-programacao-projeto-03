@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { ProfessorService } from './professor.service';
 import { ProfessorDto } from './dto/professor.dto';
 
@@ -18,16 +18,28 @@ export class ProfessorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.professorService.findOne(+id);
+    const professor = this.professorService.findOne(+id);
+    if (!professor) {
+      throw new NotFoundException(`Professor com id ${id} não encontrado.`);
+    }
+    return professor;
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProfessorDto: ProfessorDto) {
-    return this.professorService.update(+id, updateProfessorDto);
+    const updated = this.professorService.update(+id, updateProfessorDto);
+    if (!updated) {
+      throw new NotFoundException(`Professor com id ${id} não encontrado.`);
+    }
+    return updated;
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.professorService.remove(+id);
+    const deleted = this.professorService.remove(+id);
+    if (!deleted) {
+      throw new NotFoundException(`Professor com id ${id} não encontrado.`);
+    }
+    return deleted;
   }
 }

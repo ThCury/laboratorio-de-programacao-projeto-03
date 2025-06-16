@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { InstituicaoService } from './instituicao.service';
 import { InstituicaoDto } from './dto/instituicao.dto';
 
@@ -18,16 +18,28 @@ export class InstituicaoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.instituicaoService.findOne(+id);
+    const instituicao = this.instituicaoService.findOne(+id);
+    if (!instituicao) {
+      throw new NotFoundException(`Instituição com id ${id} não encontrada.`);
+    }
+    return instituicao;
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateInstituicaoDto: InstituicaoDto) {
-    return this.instituicaoService.update(+id, updateInstituicaoDto);
+    const updated = this.instituicaoService.update(+id, updateInstituicaoDto);
+    if (!updated) {
+      throw new NotFoundException(`Instituição com id ${id} não encontrada.`);
+    }
+    return updated;
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.instituicaoService.remove(+id);
+    const deleted = this.instituicaoService.remove(+id);
+    if (!deleted) {
+      throw new NotFoundException(`Instituição com id ${id} não encontrada.`);
+    }
+    return deleted;
   }
 }

@@ -3,23 +3,40 @@ import { TransacaoDto } from './dto/transacao.dto';
 
 @Injectable()
 export class TransacaoService {
-  create(createTransacaoDto: TransacaoDto) {
-    return 'This action adds a new transacao';
+  private transacoes: TransacaoDto[] = [];
+  private currentId = 1;
+
+  create(createTransacaoDto: TransacaoDto): TransacaoDto {
+    const novaTransacao: TransacaoDto = {
+      id: this.currentId++,
+      ...createTransacaoDto,
+    };
+    this.transacoes.push(novaTransacao);
+    return novaTransacao;
   }
 
-  findAll() {
-    return `This action returns all transacao`;
+  findAll(): TransacaoDto[] {
+    return this.transacoes;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transacao`;
+  findOne(id: number): TransacaoDto | undefined {
+    return this.transacoes.find(t => t.id === id);
   }
 
-  update(id: number, updateTransacaoDto: TransacaoDto) {
-    return `This action updates a #${id} transacao`;
+  update(id: number, updateTransacaoDto: TransacaoDto): TransacaoDto | undefined {
+    const index = this.transacoes.findIndex(t => t.id === id);
+    if (index === -1) return undefined;
+
+    this.transacoes[index] = { ...this.transacoes[index], ...updateTransacaoDto, id };
+    return this.transacoes[index];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transacao`;
+  remove(id: number): TransacaoDto | undefined {
+    const index = this.transacoes.findIndex(t => t.id === id);
+    if (index === -1) return undefined;
+
+    const deleted = this.transacoes[index];
+    this.transacoes.splice(index, 1);
+    return deleted;
   }
 }

@@ -12,101 +12,96 @@ import {
 } from 'antd';
 import styled from 'styled-components';
 import { url } from '../../url';
-import { useNavigate } from 'react-router-dom';  // import useNavigate
 
 const Container = styled.div`
   padding: 2rem;
 `;
 
-interface Empresa {
+interface Instituicao {
   id: number;
   nome: string;
-  email: string;
-  cnpj: string;
+  endereco: string;
+  telefone: string;
 }
 
-export function EmpresaPage() {
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+export function InstituicaoPage() {
+  const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingEmpresa, setEditingEmpresa] = useState<Empresa | null>(null);
+  const [editingInstituicao, setEditingInstituicao] = useState<Instituicao | null>(null);
   const [form] = Form.useForm();
 
-  const navigate = useNavigate(); // hook para navegar
-
-  // Função para buscar empresas
-  const fetchEmpresas = async () => {
+  // Buscar instituições
+  const fetchInstituicoes = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${url}/empresa/buscarEmpresas`);
-      setEmpresas(res.data);
+      const res = await axios.get(`${url}/instituicao`);
+      setInstituicoes(res.data);
     } catch (error) {
-      message.error('Erro ao buscar empresas.');
+      message.error('Erro ao buscar instituições.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchEmpresas();
+    fetchInstituicoes();
   }, []);
 
+  // Abrir modal de cadastro
   const handleAdd = () => {
-    setEditingEmpresa(null);
+    setEditingInstituicao(null);
     form.resetFields();
     setModalVisible(true);
   };
 
-  const handleEdit = (empresa: Empresa) => {
-    setEditingEmpresa(empresa);
-    form.setFieldsValue(empresa);
+  // Editar
+  const handleEdit = (instituicao: Instituicao) => {
+    setEditingInstituicao(instituicao);
+    form.setFieldsValue(instituicao);
     setModalVisible(true);
   };
 
+  // Excluir
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`${url}/empresa/deletarEmpresa/${id}`);
-      message.success('Empresa deletada.');
-      fetchEmpresas();
+      await axios.delete(`${url}/instituicao/${id}`);
+      message.success('Instituição deletada.');
+      fetchInstituicoes();
     } catch {
-      message.error('Erro ao deletar empresa.');
+      message.error('Erro ao deletar instituição.');
     }
   };
 
+  // Salvar ou atualizar
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      if (editingEmpresa) {
-        await axios.put(`${url}/empresa/editarEmpresa/${editingEmpresa.id}`, values);
-        message.success('Empresa atualizada!');
+      if (editingInstituicao) {
+        await axios.patch(`${url}/instituicao/${editingInstituicao.id}`, values);
+        message.success('Instituição atualizada!');
       } else {
-        await axios.post(`${url}/empresa/cadastro`, values);
-        message.success('Empresa cadastrada!');
+        await axios.post(`${url}/instituicao`, values);
+        message.success('Instituição cadastrada!');
       }
       setModalVisible(false);
-      fetchEmpresas();
+      fetchInstituicoes();
     } catch (err) {
-      message.error('Erro ao salvar empresa.');
+      message.error('Erro ao salvar instituição.');
     }
   };
 
-  // Nova função para redirecionar para vantagens da empresa
-  const handleVantagens = (empresa: Empresa) => {
-    navigate(`/empresas/${empresa.id}/vantagens`, { state: { nome: empresa.nome } });
-  };
-
-
   const columns = [
     { title: 'Nome', dataIndex: 'nome', key: 'nome' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'CNPJ', dataIndex: 'cnpj', key: 'cnpj' },
+    { title: 'Endereço', dataIndex: 'endereco', key: 'endereco' },
+    { title: 'Telefone', dataIndex: 'telefone', key: 'telefone' },
+    { title: 'CNPJ', dataIndex: 'CNPJ', key: 'CNPJ' },
     {
       title: 'Ações',
       key: 'acoes',
-      render: (_: any, record: Empresa) => (
+      render: (_: any, record: Instituicao) => (
         <Space>
           <Button onClick={() => handleEdit(record)}>Editar</Button>
-          <Button onClick={() => handleVantagens(record)}>Vantagens</Button> {/* Botão para vantagens */}
           <Popconfirm
             title="Tem certeza que deseja excluir?"
             onConfirm={() => handleDelete(record.id)}
@@ -120,18 +115,18 @@ export function EmpresaPage() {
 
   return (
     <Container>
-      <h1>Gerenciar Empresas</h1>
+      <h1>Gerenciar Instituições</h1>
       <Button type="primary" onClick={handleAdd} style={{ marginBottom: 16 }}>
-        Adicionar Empresa
+        Adicionar Instituição
       </Button>
       <Table
         columns={columns}
-        dataSource={empresas}
+        dataSource={instituicoes}
         rowKey="id"
         loading={loading}
       />
       <Modal
-        title={editingEmpresa ? 'Editar Empresa' : 'Cadastrar Empresa'}
+        title={editingInstituicao ? 'Editar Instituição' : 'Cadastrar Instituição'}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         onOk={handleSubmit}
@@ -140,10 +135,13 @@ export function EmpresaPage() {
           <Form.Item name="nome" label="Nome" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+          <Form.Item name="endereco" label="Endereço" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="cnpj" label="CNPJ" rules={[{ required: true }]}>
+          <Form.Item name="telefone" label="Telefone" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="CNPJ" label="CNPJ" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Form>
@@ -152,4 +150,4 @@ export function EmpresaPage() {
   );
 }
 
-export default EmpresaPage;
+export default InstituicaoPage;

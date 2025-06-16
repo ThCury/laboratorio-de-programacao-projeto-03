@@ -81,34 +81,34 @@ export class EmpresaService {
   }
 
   async update(id: number, dto: EmpresaDto): Promise<EmpresaDto> {
-    const empresa = await this.prisma.empresa.update({
-      where: {
-        id: id
-      },
-      data: {
-        nome: dto.nome,
-        email: dto.email,
-        cnpj: dto.cnpj
-      }
-    })
-    return new EmpresaDto(
-      empresa.id,
-      empresa.nome,
-      empresa.email,
-      empresa.cnpj
-    )
+    try {
+      const empresa = await this.prisma.empresa.update({
+        where: { id },
+        data: {
+          nome: dto.nome,
+          email: dto.email,
+          cnpj: dto.cnpj,
+        },
+      });
+
+      return new EmpresaDto(
+        empresa.id,
+        empresa.nome,
+        empresa.email,
+        empresa.cnpj
+      );
+    } catch (error) {
+      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
+    }
   }
 
   async delete(id: number) {
-    const empresa = await this.prisma.empresa.delete({
-      where: {
-        id: id
-      }
-    })
-    if (!empresa) {
+    try {
+      await this.prisma.empresa.delete({ where: { id } });
+      return { message: `Empresa com Id ${id} deletada com sucesso` };
+    } catch (error) {
       throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
     }
-    return { message: `Empresa com Id ${id} deletado com sucesso` };
   }
 
   async addVantagemToEmpresa(empresaId: number, dto: VantagemDto): Promise<VantagemDto> {

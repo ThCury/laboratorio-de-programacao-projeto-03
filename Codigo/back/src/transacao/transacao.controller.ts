@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { TransacaoService } from './transacao.service';
 import { TransacaoDto } from './dto/transacao.dto';
 
@@ -18,16 +18,28 @@ export class TransacaoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.transacaoService.findOne(+id);
+    const transacao = this.transacaoService.findOne(+id);
+    if (!transacao) {
+      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
+    }
+    return transacao;
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTransacaoDto: TransacaoDto) {
-    return this.transacaoService.update(+id, updateTransacaoDto);
+    const updated = this.transacaoService.update(+id, updateTransacaoDto);
+    if (!updated) {
+      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
+    }
+    return updated;
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.transacaoService.remove(+id);
+    const deleted = this.transacaoService.remove(+id);
+    if (!deleted) {
+      throw new NotFoundException(`Transação com id ${id} não encontrada.`);
+    }
+    return deleted;
   }
 }
