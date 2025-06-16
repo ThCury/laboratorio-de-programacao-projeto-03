@@ -15,9 +15,6 @@ const App: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Header>
         <Menu theme="dark" mode="horizontal" selectable={false}>
-          <Menu.Item key="home">
-            <Link to="/">Home</Link>
-          </Menu.Item>
           <Menu.Item key="alunos">
             <Link to="/alunos">Alunos</Link>
           </Menu.Item>
