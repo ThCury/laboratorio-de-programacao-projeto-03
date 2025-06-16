@@ -51,7 +51,6 @@ export class TransacaoService {
 
     else if (transacaoDto.tipo === 'RESGATE_VANTAGEM') {
       if (transacaoDto.alunoId === undefined ||
-        transacaoDto.valor === undefined ||
         transacaoDto.vantagemId === undefined) {
         throw new Error('alunoId, valor and vantagemId must be defined');
       }
