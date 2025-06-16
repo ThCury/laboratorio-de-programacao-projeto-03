@@ -1,0 +1,56 @@
+@startuml comunication-diagram
+left to right direction
+package "Usuários" {
+    object Aluno
+    object Professor
+    object EmpresaParceira
+}
+
+package "Sistemas Internos" {
+    object Autenticacao
+    object SistemaMerito
+    object BancoDeDados
+    object ServicoEmail
+}
+
+Aluno --> Autenticacao : login()
+Autenticacao --> BancoDeDados : verificarCredenciais()
+BancoDeDados --> Autenticacao : OK
+Autenticacao --> Aluno : acessoLiberado
+
+Aluno --> SistemaMerito : cadastrarAluno(dados pessoais, instituição)
+SistemaMerito --> BancoDeDados : salvarAluno()
+BancoDeDados --> SistemaMerito : alunoSalvo
+
+Professor --> SistemaMerito : enviarMoedas(aluno, quantidade, motivo)
+SistemaMerito --> BancoDeDados : verificarSaldo(professor)
+BancoDeDados --> SistemaMerito : saldoOk
+SistemaMerito --> BancoDeDados : registrarTransacao()
+SistemaMerito --> BancoDeDados : atualizarSaldos()
+SistemaMerito --> ServicoEmail : notificarAluno()
+
+Professor --> SistemaMerito : consultarExtrato()
+SistemaMerito --> BancoDeDados : buscarTransacoesProfessor()
+BancoDeDados --> SistemaMerito : listaTransacoes
+SistemaMerito --> Professor : extratoProfessor
+
+Aluno --> SistemaMerito : consultarExtrato()
+SistemaMerito --> BancoDeDados : buscarTransacoesAluno()
+BancoDeDados --> SistemaMerito : listaTransacoes
+SistemaMerito --> Aluno : extratoAluno
+
+Aluno --> SistemaMerito : resgatarVantagem(vantagemId)
+SistemaMerito --> BancoDeDados : verificarSaldoAluno()
+BancoDeDados --> SistemaMerito : saldoOk
+SistemaMerito --> BancoDeDados : registrarResgate()
+SistemaMerito --> BancoDeDados : atualizarSaldoAluno()
+SistemaMerito --> ServicoEmail : enviarCupomAluno()
+SistemaMerito --> ServicoEmail : notificarEmpresaParceira()
+
+EmpresaParceira --> SistemaMerito : cadastrarEmpresa(dados)
+SistemaMerito --> BancoDeDados : salvarEmpresa()
+
+EmpresaParceira --> SistemaMerito : cadastrarVantagem(descricao, custo, foto)
+SistemaMerito --> BancoDeDados : salvarVantagem()
+
+@enduml

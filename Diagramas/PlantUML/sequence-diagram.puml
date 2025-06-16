@@ -1,0 +1,81 @@
+@startuml sequence-diagram
+actor Aluno
+actor Professor
+actor Empresa
+actor SistemaAutenticacao as Auth
+participant SistemaMerito as Sistema
+database BancoDeDados as DB
+participant Email
+
+== Login ==
+Aluno -> Auth : login(credenciais)
+Auth -> DB : verificarCredenciais()
+DB --> Auth : OK
+Auth --> Aluno : autenticaçãoSucesso
+
+Professor -> Auth : login(credenciais)
+Auth -> DB : verificarCredenciais()
+DB --> Auth : OK
+Auth --> Professor : autenticaçãoSucesso
+
+Empresa -> Auth : login(credenciais)
+Auth -> DB : verificarCredenciais()
+DB --> Auth : OK
+Auth --> Empresa : autenticaçãoSucesso
+
+== 1. Cadastro de aluno ==
+Aluno -> Sistema : cadastrarAluno(dadosPessoais, instituicaoId, curso)
+Sistema -> DB : verificarInstituicao(instituicaoId)
+DB --> Sistema : instituicaoValida
+Sistema -> DB : salvarAluno()
+Sistema --> Aluno : cadastroConcluido
+
+== 2. Envio de moedas ==
+Professor -> Sistema : enviarMoedas(alunoId, quantidade, motivo)
+Sistema -> DB : verificarSaldo(professorId)
+DB --> Sistema : saldoAtual
+alt saldo suficiente
+    Sistema -> DB : registrarTransacao()
+    Sistema -> DB : atualizarSaldos()
+    Sistema -> Email : notificarAluno(aluno.email, "Você recebeu moedas", motivo)
+    Sistema --> Professor : envioConcluido
+else saldo insuficiente
+    Sistema --> Professor : erro("Saldo insuficiente")
+end
+
+== 3. Consulta de extrato ==
+Aluno -> Sistema : consultarExtrato()
+Sistema -> DB : buscarTransacoesAluno(alunoId)
+DB --> Sistema : transacoes
+Sistema --> Aluno : exibirExtrato
+
+Professor -> Sistema : consultarExtrato()
+Sistema -> DB : buscarTransacoesProfessor(professorId)
+DB --> Sistema : transacoes
+Sistema --> Professor : exibirExtrato
+
+== 4. Cadastro de empresa parceira ==
+Empresa -> Sistema : cadastrarEmpresa(dados)
+Sistema -> DB : salvarEmpresa()
+Sistema --> Empresa : cadastroConcluido
+
+== 5. Cadastro de vantagem ==
+Empresa -> Sistema : cadastrarVantagem(descricao, foto, custo)
+Sistema -> DB : salvarVantagem()
+Sistema --> Empresa : vantagemCadastrada
+
+== 6. Resgate de vantagem ==
+Aluno -> Sistema : resgatarVantagem(vantagemId)
+Sistema -> DB : verificarSaldoAluno()
+DB --> Sistema : saldoOk
+alt saldo suficiente
+    Sistema -> DB : registrarResgate()
+    Sistema -> DB : atualizarSaldoAluno()
+    Sistema -> Email : enviarCupom(aluno.email, codigo)
+    Sistema -> Email : notificarEmpresaParceira(empresa.email, codigo)
+    Sistema --> Aluno : resgateConcluido
+else saldo insuficiente
+    Sistema --> Aluno : erro("Saldo insuficiente")
+end
+
+@enduml
